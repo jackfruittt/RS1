@@ -1,0 +1,19 @@
+# ROS2 build artifacts
+#build/
+#install/
+#log/
+
+# Docker volumes 
+docker-home/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Personal IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

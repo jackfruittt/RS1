@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  ros2-dev:
+    build: .
+    image: rs1_ros2_humble:latest
+    container_name: ros2-rs1-dev
+    stdin_open: true
+    tty: true
+    environment:
+      - DISPLAY=host.docker.internal:0
+    volumes:
+      - .:/root/rs1_ws              # Mount entire repo as workspace
+      - ./docker-home:/root         
+    networks:
+      - ros2-network
+    restart: unless-stopped
+    command: tail -f /dev/null
+
+networks:
+  ros2-network:
+    driver: bridge
