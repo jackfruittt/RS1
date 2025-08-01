@@ -8,13 +8,32 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - DISPLAY=host.docker.internal:0
+      - DISPLAY=:0
+      - WAYLAND_DISPLAY=$WAYLAND_DISPLAY
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+      - PULSE_SERVER=$PULSE_SERVER
+      # GPU support
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
     volumes:
-      - .:/root/rs1_ws              # Mount entire repo as workspace
-      - ./docker-home:/root         
+      - .:/root/rs1_ws
+      - ./docker-home:/root              # Mount entire repo as workspace 
+      # WSL2 display support
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /mnt/wslg:/mnt/wslg:rw
+      - /usr/lib/wsl:/usr/lib/wsl:ro
     networks:
       - ros2-network
     restart: unless-stopped
+    # Enable GPU runtime
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     command: tail -f /dev/null
 
 networks:
