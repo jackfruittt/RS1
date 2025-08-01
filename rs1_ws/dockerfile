@@ -26,6 +26,16 @@ RUN apt-get update && apt-get install -y \
     ros-humble-irobot-create-nodes \
     ros-humble-nav2-bringup \
     ros-humble-slam-toolbox \
+    # GPU and graphics support for better Gazebo performance
+    mesa-utils \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglvnd0 \
+    libgl1 \
+    libglx0 \
+    libegl1 \
+    libxext6 \
+    libx11-6 \
     git \
     vim \
     ssh \
@@ -57,6 +67,11 @@ ENV PATH=/opt/ros/humble/bin:$PATH
 ENV PYTHONPATH=/opt/ros/humble/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages
 ENV ROS_DISTRO=humble
 ENV ROS_VERSION=2
+
+# GPU environment variables
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=all
+ENV __GLX_VENDOR_LIBRARY_NAME=nvidia
 
 RUN echo "Setup Success!"
 
