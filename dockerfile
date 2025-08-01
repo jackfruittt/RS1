@@ -1,0 +1,62 @@
+FROM osrf/ros:humble-desktop-full
+
+# Set workspace name as build arg
+ARG WORKSPACE_NAME=rs1_ws
+ENV WORKSPACE_NAME=${WORKSPACE_NAME}
+
+# Install dev tools and simulation dependencies
+RUN apt-get update && apt-get install -y \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    python3-vcstool \
+    python3-pyqt5 \
+    python3-pyqt5.qtmultimedia \
+    pyqt5-dev-tools \
+    qttools5-dev-tools \
+    x11-apps \
+    python3-opencv \
+    ros-humble-cv-bridge \
+    ros-humble-image-transport \
+    wget \
+    ros-dev-tools \
+    ros-humble-robot-localization \
+    ros-humble-ros-ign \
+    ros-humble-ros-ign-interfaces \
+    ros-humble-turtlebot4-simulator \
+    ros-humble-irobot-create-nodes \
+    ros-humble-nav2-bringup \
+    ros-humble-slam-toolbox \
+    git \
+    vim \
+    ssh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Ignition Fortress 
+RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y ignition-fortress \
+    && rm -rf /var/lib/apt/lists/*
+
+# Init rosdep
+RUN rosdep update
+
+# Set working directory and create workspace
+WORKDIR /root/${WORKSPACE_NAME}
+RUN mkdir -p src
+
+# Add ROS2 sourcing to bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+RUN echo "source ~/${WORKSPACE_NAME}/install/setup.bash" >> ~/.bashrc || true
+
+# Set environment variables for non-interactive shells
+ENV AMENT_PREFIX_PATH=/opt/ros/humble
+ENV COLCON_PREFIX_PATH=/opt/ros/humble
+ENV LD_LIBRARY_PATH=/opt/ros/humble/lib
+ENV PATH=/opt/ros/humble/bin:$PATH
+ENV PYTHONPATH=/opt/ros/humble/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages
+ENV ROS_DISTRO=humble
+ENV ROS_VERSION=2
+
+RUN echo "Setup Success!"
+
